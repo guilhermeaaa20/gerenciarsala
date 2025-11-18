@@ -14,18 +14,76 @@
 </style>
 <body class="m-0">
     <!--Parte de cima-->
-  <div class="container display 6">
-      <h1>Haba de Administrador</h1>
-      <p>Aqui é possivel criar salas, e fazer relatorios</p>
-  </div>   
-  <!--Botões-->
-  <div class="d-flex justify-content-center align-items-center vh-100" style="max-height: 500px;">
-      <div class="d-flex gap-3">
-          <button type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Criar Sala</button>
-          <button type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Large button</button>
-          <button type="button" class="btn btn-primary btn-lg"  style="font-size: 30px;">Fazer Relatório</button>
-      </div>
-  </div>
+    <div class="container display-6">
+        <h1>Haba de Administrador</h1>
+        <p>Aqui é possivel criar salas, e fazer relatorios</p>
+    </div>   
+    <!--Botões-->
+    <div class="d-flex justify-content-center align-items-center vh-100" style="max-height: 500px;">
+        <div class="d-flex gap-3">
+            <!-- Botão Criar Sala -->
+            <div>
+                <input id="inputSala" type="text" class="form-control mb-2" placeholder="Digite o nome da sala" style="font-size: 20px;">
+                <button id="btnCriarSala" type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Criar Sala</button>
+            </div>
+            <!-- Botão para exibir lista -->
+            <div class="dropdown">
+                <button id="btnListaSalas" type="button" class="btn btn-primary btn-lg dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 30px;">
+                    Ver Salas
+                </button>
+                <ul id="listaSalas" class="dropdown-menu" style="max-height: 200px; overflow-y: auto;">
+                    <!-- Lista de salas será preenchida dinamicamente -->
+                </ul>
+            </div>
+            <!-- Botão Fazer Relatório -->
+            <button type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Fazer Relatório</button>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Referências aos elementos
+        const inputSala = document.getElementById('inputSala');
+        const btnCriarSala = document.getElementById('btnCriarSala');
+        const listaSalas = document.getElementById('listaSalas');
+
+        // Array para armazenar os nomes das salas
+        const salas = [];
+
+        // Função para adicionar uma sala
+        function adicionarSala(nome) {
+            if (nome.trim() !== '') {
+                salas.push(nome);
+                alert(`Sala "${nome}" criada com sucesso!`);
+                atualizarListaSalas();
+            } else {
+                alert('Por favor, insira um nome válido para a sala.');
+            }
+        }
+
+        // Atualizar a lista de salas no menu suspenso
+        function atualizarListaSalas() {
+            listaSalas.innerHTML = ''; // Limpa a lista
+            salas.forEach((sala, index) => {
+                const item = document.createElement('li');
+                item.className = 'dropdown-item';
+                item.textContent = `${index + 1}. ${sala}`;
+                listaSalas.appendChild(item);
+            });
+        }
+
+        // Evento de clique no botão "Criar Sala"
+        btnCriarSala.addEventListener('click', () => {
+            adicionarSala(inputSala.value);
+            inputSala.value = ''; // Limpa o campo de entrada
+        });
+
+        // Evento de pressionar "Enter" no campo de entrada
+        inputSala.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                adicionarSala(inputSala.value);
+                inputSala.value = ''; // Limpa o campo de entrada
+            }
+        });
+    </script>
 </body>
 </html>
