@@ -10,7 +10,93 @@
     body {
         background-color: black;
         margin: 0;
+        color: #f8f9fa;
     }
+
+    /* Card estilizado ao redor dos botões */
+    .actions-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        padding: 18px;
+        border-radius: 14px;
+        align-items: center;
+    }
+
+    /* Efeito sutil e cursor pointer para todos os botões dentro do card */
+    .actions-card .btn {
+        transition: transform 120ms ease, filter 150ms ease, box-shadow 150ms ease;
+        cursor: pointer;
+    }
+
+    .actions-card .btn:hover {
+        filter: brightness(1.06);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+
+    /* Input e selects com cursor padrão, mas botões mostram pointer */
+    .actions-card input.form-control,
+    .actions-card select.form-select {
+        border-radius: 8px;
+    }
+
+    /* Ajuste responsivo para telas pequenas */
+    @media (max-width: 576px) {
+        .actions-card { padding: 12px; }
+        .actions-card .btn { font-size: 18px; }
+    }
+
+    /* Linha pontilhada entre os três blocos dentro do card (apenas em telas maiores) */
+    .actions-card > *:not(:last-child) {
+        border-right: 1px dotted rgba(255,255,255,0.12);
+        padding-right: 18px;
+        margin-right: 18px;
+    }
+
+    /* Remove linhas em telas menores para evitar sobreposição */
+    @media (max-width: 768px) {
+        .actions-card > *:not(:last-child) {
+            border-right: none;
+            padding-right: 0;
+            margin-right: 0;
+        }
+        .profile-btn { top: -22px; font-size: 18px; padding: 10px 18px; }
+    }
+
+    /* Estilo do botão de perfil grande */
+    .profile-btn {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%); /* centraliza horizontalmente */
+        top: -28px; /* sobrepõe levemente o card */
+        padding: 14px 26px;
+        font-size: 22px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        z-index: 5;
+    }
+
+    /* Espaçamento extra para a área interna do card quando o botão estiver sobre ela */
+    .actions-card.mt-4 { padding-top: 36px; }
+
+    /* Botão voltar (admin) - discreto, canto inferior direito, não encosta na borda */
+    .voltar-btn-admin {
+        position: fixed;
+        right: 24px;
+        bottom: 36px;
+        background: rgba(220,53,69,0.9);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        z-index: 1200;
+        transition: transform 120ms ease, opacity 120ms ease;
+        opacity: 0.95;
+    }
+    .voltar-btn-admin:hover { transform: translateY(-3px); opacity: 1; }
 </style>
 <body class="m-0">
     <!--Parte de cima-->
@@ -20,23 +106,104 @@
     </div>   
     <!--Botões-->
     <div class="d-flex justify-content-center align-items-center vh-100" style="max-height: 500px;">
-        <div class="d-flex gap-3">
-            <!-- Botão Criar Sala -->
+        <div class="position-relative" style="max-width: 1100px; width:100%;">
+            <!-- Botão grande sobre o card para criar perfil de professor -->
+            <button id="btnCriarPerfil" type="button" class="btn btn-warning profile-btn" data-bs-toggle="modal" data-bs-target="#modalProfessor">Criar Perfil de Professor</button>
+            <div class="d-flex gap-3 actions-card mt-4">
+            <!-- Perfil (select para alternar entre perfis) e Botão Criar Sala -->
             <div>
+                <label for="selectProfessores" class="form-label text-white">Perfil</label>
+                <select id="selectProfessores" class="form-select mb-2" style="min-width:220px">
+                    <option value="" selected>Sem perfil selecionado</option>
+                </select>
                 <input id="inputSala" type="text" class="form-control mb-2" placeholder="Digite o nome da sala" style="font-size: 20px;">
                 <button id="btnCriarSala" type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Criar Sala</button>
             </div>
-            <!-- Botão para exibir lista -->
-            <div class="dropdown">
-                <button id="btnListaSalas" type="button" class="btn btn-primary btn-lg dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 30px;">
-                    Ver Salas
+            <!-- Botão para abrir modal de agendamento -->
+            <div>
+                <button id="btnAgendarSalas" type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAgendamento" style="font-size: 30px;">
+                    Agendar Salas (Dia / Mês)
                 </button>
-                <ul id="listaSalas" class="dropdown-menu" style="max-height: 200px; overflow-y: auto;">
-                    <!-- Lista de salas será preenchida dinamicamente -->
-                </ul>
             </div>
             <!-- Botão Fazer Relatório -->
-            <button type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Fazer Relatório</button>
+            <button id="btnRelatorio" type="button" class="btn btn-primary btn-lg" style="font-size: 30px;">Fazer Relatório</button>
+        </div>
+    </div>
+
+    <!-- Modal de Agendamento -->
+    <div class="modal fade" id="modalAgendamento" tabindex="-1" aria-labelledby="modalAgendamentoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgendamentoLabel">Agendar Sala</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="selectSalas" class="form-label">Sala</label>
+                        <select id="selectSalas" class="form-select">
+                            <option value="" disabled selected>Selecione uma sala</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 d-flex gap-2">
+                        <div style="flex:1">
+                            <label for="inputDia" class="form-label">Dia</label>
+                            <input id="inputDia" type="number" class="form-control" min="1" max="31" placeholder="1-31">
+                        </div>
+                        <div style="flex:1">
+                            <label for="selectMes" class="form-label">Mês</label>
+                            <select id="selectMes" class="form-select">
+                                <option value="" disabled selected>Selecione o mês</option>
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">Março</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button id="btnConfirmarAgendamento" type="button" class="btn btn-success">Agendar</button>
+                    </div>
+                    <hr>
+                    <h6>Agendamentos</h6>
+                    <ul id="listaAgendamentos" class="list-group" style="max-height:200px; overflow-y:auto"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Criação de Perfil de Professor -->
+    <div class="modal fade" id="modalProfessor" tabindex="-1" aria-labelledby="modalProfessorLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalProfessorLabel">Criar Perfil de Professor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="inputProfessorName" class="form-label">Nome do Professor</label>
+                        <input id="inputProfessorName" type="text" class="form-control" placeholder="Ex: João da Silva">
+                    </div>
+                    <div class="mb-3">
+                        <button id="btnCriarProfessorConfirm" type="button" class="btn btn-warning">Criar Perfil</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -44,46 +211,148 @@
         // Referências aos elementos
         const inputSala = document.getElementById('inputSala');
         const btnCriarSala = document.getElementById('btnCriarSala');
-        const listaSalas = document.getElementById('listaSalas');
+        const selectSalas = document.getElementById('selectSalas');
+        const inputDia = document.getElementById('inputDia');
+        const selectMes = document.getElementById('selectMes');
+        const btnConfirmarAgendamento = document.getElementById('btnConfirmarAgendamento');
+        const listaAgendamentos = document.getElementById('listaAgendamentos');
+        const selectProfessores = document.getElementById('selectProfessores');
+        const btnCriarProfessorConfirm = document.getElementById('btnCriarProfessorConfirm');
+        const inputProfessorName = document.getElementById('inputProfessorName');
 
-        // Array para armazenar os nomes das salas
-        const salas = [];
+        // Arrays para armazenar os perfis, salas e agendamentos
+        // Carregamos de localStorage para que outras páginas (ex: aluno.html) possam ler
+        const professores = JSON.parse(localStorage.getItem('professores') || '[]');
+        const salas = JSON.parse(localStorage.getItem('salas') || '[]'); // cada sala será { name, professor }
+        const agendamentos = JSON.parse(localStorage.getItem('agendamentos') || '[]'); // cada agendamento terá salaName, professor, dia, mes
 
-        // Função para adicionar uma sala
-        function adicionarSala(nome) {
-            if (nome.trim() !== '') {
-                salas.push(nome);
-                alert(`Sala "${nome}" criada com sucesso!`);
-                atualizarListaSalas();
-            } else {
-                alert('Por favor, insira um nome válido para a sala.');
-            }
+        function saveProfessores() { localStorage.setItem('professores', JSON.stringify(professores)); }
+        function saveSalas() { localStorage.setItem('salas', JSON.stringify(salas)); }
+        function saveAgendamentos() { localStorage.setItem('agendamentos', JSON.stringify(agendamentos)); }
+
+        // Adiciona um professor ao sistema
+        function adicionarProfessor(nome) {
+            if (!nome || nome.trim() === '') { alert('Informe um nome válido para o professor.'); return; }
+            professores.push(nome.trim());
+            saveProfessores();
+            atualizarSelectProfessores();
+            alert(`Perfil do professor "${nome.trim()}" criado.`);
         }
 
-        // Atualizar a lista de salas no menu suspenso
-        function atualizarListaSalas() {
-            listaSalas.innerHTML = ''; // Limpa a lista
-            salas.forEach((sala, index) => {
-                const item = document.createElement('li');
-                item.className = 'dropdown-item';
-                item.textContent = `${index + 1}. ${sala}`;
-                listaSalas.appendChild(item);
+        function atualizarSelectProfessores() {
+            // preserva opção padrão
+            selectProfessores.innerHTML = '<option value="">Sem perfil selecionado</option>';
+            professores.forEach((p) => {
+                const option = document.createElement('option');
+                option.value = p;
+                option.textContent = p;
+                selectProfessores.appendChild(option);
             });
         }
 
-        // Evento de clique no botão "Criar Sala"
+        // Função para adicionar uma sala (associa ao perfil selecionado)
+        function adicionarSala(nome) {
+            if (!nome || nome.trim() === '') { alert('Por favor, insira um nome válido para a sala.'); return; }
+            const perfil = selectProfessores.value || 'Sem perfil';
+            salas.push({ name: nome.trim(), professor: perfil });
+            saveSalas();
+            alert(`Sala "${nome.trim()}" criada com sucesso para o professor: ${perfil}`);
+            atualizarSelectSalas();
+        }
+
+        // Atualizar o <select> de salas no modal
+        function atualizarSelectSalas() {
+            // limpa e adiciona a opção padrão
+            selectSalas.innerHTML = '<option value="" disabled selected>Selecione uma sala</option>';
+            salas.forEach((sala, index) => {
+                const option = document.createElement('option');
+                option.value = index; // usamos índice para referenciar o objeto
+                option.textContent = `${index + 1}. ${sala.name} — Prof: ${sala.professor}`;
+                selectSalas.appendChild(option);
+            });
+        }
+
+        // Função para adicionar agendamento
+        function agendarSala(salaIndex, dia, mes) {
+            if (salaIndex === '' || salaIndex === null || salaIndex === undefined) { alert('Selecione uma sala.'); return; }
+            const idx = Number(salaIndex);
+            if (Number.isNaN(idx) || !salas[idx]) { alert('Sala inválida.'); return; }
+            if (!dia || dia < 1 || dia > 31) { alert('Informe um dia válido (1-31).'); return; }
+            if (!mes || mes < 1 || mes > 12) { alert('Selecione um mês válido.'); return; }
+
+            const salaObj = salas[idx];
+            const agendamento = { salaName: salaObj.name, professor: salaObj.professor, dia: Number(dia), mes: Number(mes) };
+            agendamentos.push(agendamento);
+            saveAgendamentos();
+            alert(`Agendado: ${salaObj.name} (Prof: ${salaObj.professor}) no dia ${dia}/${mes}.`);
+            atualizarListaAgendamentos();
+        }
+
+        // Atualizar lista de agendamentos exibida no modal
+        function atualizarListaAgendamentos() {
+            listaAgendamentos.innerHTML = '';
+            agendamentos.forEach((a, idx) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.textContent = `${idx + 1}. Sala: ${a.salaName} — Professor: ${a.professor} — Dia: ${a.dia} — Mês: ${a.mes}`;
+                listaAgendamentos.appendChild(li);
+            });
+        }
+
+        // Eventos
         btnCriarSala.addEventListener('click', () => {
             adicionarSala(inputSala.value);
             inputSala.value = ''; // Limpa o campo de entrada
         });
 
-        // Evento de pressionar "Enter" no campo de entrada
         inputSala.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 adicionarSala(inputSala.value);
                 inputSala.value = ''; // Limpa o campo de entrada
             }
         });
+
+        btnConfirmarAgendamento.addEventListener('click', () => {
+            const salaIndex = selectSalas.value;
+            const dia = inputDia.value;
+            const mes = selectMes.value;
+            agendarSala(salaIndex, dia, mes);
+        });
+
+        // Criação de perfil via modal
+        btnCriarProfessorConfirm.addEventListener('click', () => {
+            const nome = inputProfessorName.value;
+            adicionarProfessor(nome);
+            inputProfessorName.value = '';
+            // fecha o modal programaticamente
+            const modalEl = document.getElementById('modalProfessor');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        });
+
+        // Atualiza label/contexto quando trocar perfil (opcional: apenas info)
+        selectProfessores.addEventListener('change', () => {
+            const perfil = selectProfessores.value || 'Sem perfil selecionado';
+            // pequena confirmação visual via tooltip/alert opcional
+        });
+
+        // Botão Relatório: exibe os agendamentos existentes
+        const btnRelatorio = document.getElementById('btnRelatorio');
+        btnRelatorio.addEventListener('click', () => {
+            if (agendamentos.length === 0) {
+                alert('Nenhum agendamento.');
+                return;
+            }
+            const mensagens = agendamentos.map(a => `Novo agendamento no dia: ${a.dia}/${a.mes} — Professor: ${a.professor} — Sala: ${a.salaName}`);
+            alert(mensagens.join('\n'));
+        });
+
+        // Inicialização mínima (carrega selects a partir do localStorage)
+        atualizarSelectProfessores();
+        atualizarSelectSalas();
+        atualizarListaAgendamentos();
     </script>
+    <!-- Botão Voltar (Admin) -->
+    <a href="index.html" class="voltar-btn-admin">Voltar</a>
 </body>
 </html>

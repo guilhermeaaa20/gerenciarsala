@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Padrão/Alunos</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+        <style>
+            body { background: #f8f9fb; font-family: Arial, Helvetica, sans-serif; }
+            /* Header superior com título e parágrafo maiores e em negrito */
+            header.site-header {
+                position: sticky;
+                top: 0;
+                background: linear-gradient(180deg, #ffffffee, #f1f5f9ee);
+                padding: 26px 12px;
+                text-align: center;
+                box-shadow: 0 6px 18px rgba(15, 41, 60, 0.06);
+                z-index: 20;
+            }
+            header.site-header h1 {
+                font-size: 40px;
+                color: #1e88e5; /* azul */
+                margin: 0;
+                font-weight: 800;
+                letter-spacing: 0.2px;
+            }
+            header.site-header p {
+                font-size: 20px;
+                color: #D4A017; /* amarelo mostarda */
+                margin: 6px 0 0 0;
+                font-weight: 700;
+            }
+            @media (max-width: 576px) {
+                header.site-header { padding: 18px 10px; }
+                header.site-header h1 { font-size: 26px; }
+                header.site-header p { font-size: 16px; }
+            }
+            /* mantém algum espaçamento do conteúdo abaixo do header */
+                main.container { padding-top: 18px; }
+
+            /* Cards centrais */
+            .cards-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 28px;
+                padding: 48px 0;
+                flex-wrap: nowrap;
+            }
+
+            .card-custom {
+                width: 32%;
+                min-width: 220px;
+                height: 300px;
+                border-radius: 18px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                color: white;
+                box-shadow: 0 12px 30px rgba(30,136,229,0.12);
+                border: 1px solid rgba(255,255,255,0.06);
+                padding: 20px;
+                text-align: center;
+                background: linear-gradient(180deg, #bbdefb, #1e88e5); /* claro -> normal */
+            }
+
+            .card-custom h3 { margin: 0 0 8px 0; font-size: 22px; font-weight: 700; }
+            .card-custom p { margin: 0; font-size: 16px; opacity: 0.95; }
+
+            @media (max-width: 1000px) {
+                .cards-container { gap: 18px; padding: 32px 0; }
+                .card-custom { width: 40%; height: 240px; }
+            }
+            @media (max-width: 720px) {
+                .cards-container { flex-direction: column; gap: 18px; padding: 20px 0; }
+                .card-custom { width: 100%; max-width: 520px; height: 200px; }
+            }
+            /* Botão Voltar (Aluno) - posicionado logo abaixo do cabeçalho, canto direito do conteúdo */
+            .voltar-btn-aluno {
+                display: inline-block;
+                margin-left: auto;
+                background: rgba(220,53,69,0.92);
+                color: #fff;
+                padding: 6px 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 600;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+                transition: transform 120ms ease, opacity 120ms ease;
+                opacity: 0.95;
+            }
+            .voltar-btn-aluno:hover { transform: translateY(-2px); opacity: 1; }
+        </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <h1>Olá Aluno</h1>
+        <p>O que gostaria de fazer hoje?</p>
+    </header>
+    <div class="container">
+        <div class="d-flex justify-content-end mt-2">
+            <a href="index.html" class="voltar-btn-aluno">Voltar</a>
+        </div>
+    </div>
+    <main class="container">
+        <!-- Três cards centrais -->
+        <section class="cards-container">
+            <div class="card-custom">
+                <h3>Reservar Sala</h3>
+                                <p>Veja as salas disponíveis e faça sua reserva rapidamente.</p>
+                                <button id="btnReservar" class="btn btn-light mt-3">Reservar</button>
+            </div>
+            <div class="card-custom">
+                <h3>Meus Agendamentos</h3>
+                                <p>Confira e gerencie os agendamentos que você já realizou.</p>
+                                <button id="btnMeus" class="btn btn-light mt-3">Meus Agendamentos</button>
+            </div>
+            <div class="card-custom">
+                <h3>Consultar Horários</h3>
+                                <p>Verifique horários e disponibilidade por dia e mês.</p>
+                                <button id="btnConsultar" class="btn btn-light mt-3">Consultar</button>
+            </div>
+        </section>
+    </main>
+
+        <!-- Modals -->
+        <!-- Reservar Sala Modal -->
+        <div class="modal fade" id="modalReservar" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reservar Sala</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Escolha uma sala (agendamento do administrador)</label>
+                            <select id="resSalaSelect" class="form-select"></select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirmReservar" type="button" class="btn btn-primary">Confirmar Reserva</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meus Agendamentos Modal -->
+        <div class="modal fade" id="modalMeus" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Meus Agendamentos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="listaMeus" class="list-group"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consultar Horários Modal -->
+        <div class="modal fade" id="modalConsultar" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Consultar Horários</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label">Dia</label>
+                                <input id="consDia" type="number" min="1" max="31" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Mês</label>
+                                <select id="consMes" class="form-select">
+                                    <option value="">Selecione</option>
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <ul id="listaConsultar" class="list-group"></ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="btnPesquisar" type="button" class="btn btn-primary">Pesquisar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Utilitários de storage
+            function getAgendamentos() {
+                try { return JSON.parse(localStorage.getItem('agendamentos') || '[]'); } catch (e) { return []; }
+            }
+            function saveAgendamentos(arr) { localStorage.setItem('agendamentos', JSON.stringify(arr)); }
+
+            function getUserEmail() { return localStorage.getItem('userEmail') || ''; }
+
+            // Abrir modais
+            const modalReservar = new bootstrap.Modal(document.getElementById('modalReservar'));
+            const modalMeus = new bootstrap.Modal(document.getElementById('modalMeus'));
+            const modalConsultar = new bootstrap.Modal(document.getElementById('modalConsultar'));
+
+            document.getElementById('btnReservar').addEventListener('click', () => modalReservar.show());
+            document.getElementById('btnMeus').addEventListener('click', () => {
+                renderMeus(); modalMeus.show();
+            });
+            document.getElementById('btnConsultar').addEventListener('click', () => modalConsultar.show());
+
+            // Confirmar reserva
+            document.getElementById('confirmReservar').addEventListener('click', () => {
+                const selectedIdx = Number(document.getElementById('resSalaSelect').value);
+                const all = getAgendamentos();
+                const selected = all[selectedIdx];
+                const email = getUserEmail();
+                if (!selected) return alert('Selecione um agendamento disponível.');
+                if (selected.owner) return alert('Este agendamento já foi reservado. Escolha outro.');
+                const dia = selected.dia;
+                const mes = selected.mes;
+                const sala = selected.salaName;
+                // marca o agendamento selecionado com o owner (email do aluno)
+                selected.owner = email;
+                // salva de volta a lista completa
+                all[selectedIdx] = selected;
+                saveAgendamentos(all);
+                // atualiza o select para remover opção já reservada
+                preencherSelectSalasLocal();
+                alert('Reserva criada com sucesso.');
+                modalReservar.hide();
+                // limpa campos
+                document.getElementById('resSalaSelect').value = '';
+            });
+
+            // Render meus agendamentos
+            function renderMeus() {
+                const lista = document.getElementById('listaMeus');
+                lista.innerHTML = '';
+                const email = getUserEmail();
+                // mostrará agendamentos do usuário e agendamentos criados pelo administrador (sem owner)
+                const ag = getAgendamentos().filter(a => ((a.owner || '') === email) || !(a.owner));
+                if (ag.length === 0) {
+                    const li = document.createElement('li'); li.className = 'list-group-item'; li.textContent = 'Nenhum agendamento encontrado.'; lista.appendChild(li); return;
+                }
+                ag.forEach((a, idx) => {
+                    const li = document.createElement('li'); li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    const ownerLabel = a.owner ? 'Você' : (a.professor || 'Administrador');
+                    li.innerHTML = `<div><strong>${a.salaName}</strong><div>Professor: ${a.professor || '-'} — Dia: ${a.dia} / Mês: ${a.mes} — ${ownerLabel}</div></div>`;
+                    // permitir remoção apenas se for do próprio usuário
+                    if (a.owner === email) {
+                        const btn = document.createElement('button'); btn.className = 'btn btn-sm btn-danger'; btn.textContent = 'Remover';
+                        btn.addEventListener('click', () => { removeAgendamento(a); renderMeus(); });
+                        li.appendChild(btn);
+                    }
+                    lista.appendChild(li);
+                });
+            }
+
+            function removeAgendamento(target) {
+                const ag = getAgendamentos();
+                const idx = ag.findIndex(a => a.salaName === target.salaName && a.dia === target.dia && a.mes === target.mes && a.owner === target.owner);
+                if (idx === -1) return; ag.splice(idx,1); saveAgendamentos(ag);
+                // atualizar select caso tenha liberado um agendamento do admin
+                preencherSelectSalasLocal();
+            }
+
+            // Pesquisar consultas
+            document.getElementById('btnPesquisar').addEventListener('click', () => {
+                const dia = Number(document.getElementById('consDia').value);
+                const mes = Number(document.getElementById('consMes').value);
+                const ul = document.getElementById('listaConsultar'); ul.innerHTML = '';
+                if (!dia || dia < 1 || dia > 31) return alert('Informe um dia válido');
+                if (!mes || mes < 1 || mes > 12) return alert('Informe um mês válido');
+                const ag = getAgendamentos().filter(a => a.dia === dia && a.mes === mes);
+                if (ag.length === 0) { const li = document.createElement('li'); li.className='list-group-item'; li.textContent='Nenhum agendamento para esta data.'; ul.appendChild(li); return; }
+                ag.forEach(a => {
+                    const li = document.createElement('li'); li.className='list-group-item'; li.textContent = `${a.salaName} — Professor: ${a.professor || '-'} — Proprietário: ${a.owner || 'Administrador'} — Dia ${a.dia}/${a.mes}`; ul.appendChild(li);
+                });
+            });
+
+            // popula select de salas a partir dos agendamentos criados pelo administrador (localStorage 'agendamentos')
+            function preencherSelectSalasLocal() {
+                const sel = document.getElementById('resSalaSelect');
+                sel.innerHTML = '<option value="">Selecione uma sala</option>';
+                const all = getAgendamentos();
+                all.forEach((a, idx) => {
+                    // mostra apenas agendamentos sem owner (criados pelo admin)
+                    if (!a.owner) {
+                        const opt = document.createElement('option');
+                        opt.value = idx; // index na lista completa
+                        opt.textContent = `${a.salaName} — Prof: ${a.professor || '-'} — ${a.dia}/${a.mes}`;
+                        sel.appendChild(opt);
+                    }
+                });
+            }
+            preencherSelectSalasLocal();
+
+        </script>
+
+</body>
+</html>
